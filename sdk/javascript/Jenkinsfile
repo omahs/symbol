@@ -5,6 +5,7 @@ defaultCiPipeline {
 	packageId = 'sdk-javascript'
 
 	publisher = 'npm'
+	dependencyPackageToPublish = ['_build/wasm/node', '_build/wasm/web_webpack']
 
 	codeCoverageTool = 'c8'
 	minimumCodeCoverage = 90

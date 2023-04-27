@@ -11,3 +11,6 @@ wasm-pack build --release --no-typescript --target web --out-dir ../_build/wasm/
 cd ..
 
 npm run bundle
+
+sed -i 's/symbol-crypto-wasm/symbol-crypto-wasm-node/g' _build/wasm/node/package.json
+sed -i 's/symbol-crypto-wasm/symbol-crypto-wasm-web/g' _build/wasm/web_webpack/package.json

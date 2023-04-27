@@ -43,6 +43,29 @@ void dockerPublisher(Map config, String phase) {
 	}
 }
 
+void npmDependencyPublisher(Map config, String npmPublishCommand) {
+	if (null == config.dependencyPackagesToPublish) {
+		return
+	}
+
+	config.dependencyPackagesToPublish.each { packageFolder ->
+		logger.logInfo("Publishing npm dependent package ${packageFolder}")
+		runScript("pushd ${packageFolder}")
+		String packageVersion = readNpmPackageNameVersion()
+		publishedVersion = runScript("npm view ${packageVersion} version", returnStdout: true).trim()
+		if (publishedVersion == packageVersion) {
+			logger.logInfo("Package ${packageVersion} is already published. Skipping...")
+		}
+		else {
+			logger.logInfo("Publishing npm package ${readNpmPackageNameVersion()}")
+			logger.logInfo("Running command ${npmPublishCommand}")
+			//runScript(npmPublishCommand)
+		}
+
+		runScript('popd')
+	}
+}
+
 void npmPublisher(Map config, String phase) {
 	if (config.publisher != 'npm') {
 		return
@@ -57,6 +80,7 @@ void npmPublisher(Map config, String phase) {
 	writeFile(file: '.npmrc', text: '//registry.npmjs.org/:_authToken=${NPM_TOKEN}')
 	runScript('cat .npmrc')
 	withCredentials([string(credentialsId: NPM_CREDENTIALS_ID, variable: 'NPM_TOKEN')]) {
+		npmDependencyPublisher(config, npmPublishCommand);
 		logger.logInfo("Publishing npm package ${readNpmPackageNameVersion()}")
 		runScript(npmPublishCommand)
 	}
